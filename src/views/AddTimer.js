@@ -3,22 +3,42 @@ import TimeSelector from "../components/input/TimeSelector";
 import { useWorkoutContext } from "../context/WorkoutProvider";
 
 const AddTimer = () => {
-  const { timers, addTimer } = useWorkoutContext();
+  const { addTimer } = useWorkoutContext();
+  const [name, setName] = useState("");
   const [timerType, setTimerType] = useState("stopwatch");
   const [numTarget, setNumTarget] = useState(1);
   const [targetTime, setTargetTime] = useState([0, 0, 0, 0, 0]);
+  const [message, setMessage] = useState({ message: "", type: "" });
 
   const handleAdd = () => {
-    console.log(timers);
+    // Get raw value instead of state
+    const targets = targetTime.slice(0, numTarget);
+    if (targets.includes(0)) {
+      setMessage({
+        message: "Some of the target is 0. Please set all the target!",
+        type: "error",
+      });
+      return;
+    }
+
+    if (name.length === 0) {
+      console.log(name);
+      setMessage({ message: "Please enter excercise's name!", type: "error" });
+      return;
+    }
+
     addTimer(
       JSON.parse(
         JSON.stringify({
+          name,
           timerType,
-          targetTime,
+          targetTime: targetTime.slice(0, numTarget),
           countDown: timerType !== "stopwatch",
         })
       )
     );
+
+    setMessage({ message: "Timer added!", type: "confirm" });
   };
 
   const handleChangeType = (e) => {
@@ -36,9 +56,14 @@ const AddTimer = () => {
     });
   };
 
+  const handleChangeName = (e) => {
+    setName(e.target.value);
+  };
+
   return (
     <div>
       <div>
+        <div>{message.message}</div>
         <select id="timerType" onChange={handleChangeType}>
           <option value="stopwatch">Stop Watch</option>
           <option value="countdown">Count down</option>
@@ -46,13 +71,21 @@ const AddTimer = () => {
           <option value="tabata">TABATA</option>
         </select>
 
-        <select id="numTarget" onChange={handleChangeNumTarget}>
-          {[...Array(5).keys()].map((num) => (
-            <option value={num + 1} key={num + 1}>
-              {num + 1}
-            </option>
-          ))}
-        </select>
+        {timerType === "tabata" && (
+          <select id="numTarget" onChange={handleChangeNumTarget}>
+            {[...Array(5).keys()].map((num) => (
+              <option value={num + 1} key={num + 1}>
+                {num + 1}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <input
+          placeholder="Excercise's name"
+          value={name}
+          onChange={handleChangeName}
+        />
 
         <button onClick={handleAdd}>Add Timer</button>
       </div>
@@ -66,10 +99,6 @@ const AddTimer = () => {
           />
         ))}
       </div>
-
-      {timers.map((e, i) => (
-        <div key={i}>{JSON.stringify(e)}</div>
-      ))}
     </div>
   );
 };
