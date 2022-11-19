@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import TimeSelector from "../components/input/TimeSelector";
 import { useWorkoutContext } from "../context/WorkoutProvider";
+import styles from "./AddTimer.module.css";
 
 const AddTimer = () => {
   const { addTimer } = useWorkoutContext();
   const [name, setName] = useState("");
+  const [rounds, setRounds] = useState("");
   const [timerType, setTimerType] = useState("stopwatch");
   const [numTarget, setNumTarget] = useState(1);
   const [targetTime, setTargetTime] = useState([0, 0, 0, 0, 0]);
@@ -22,7 +24,6 @@ const AddTimer = () => {
     }
 
     if (name.length === 0) {
-      console.log(name);
       setMessage({ message: "Please enter excercise's name!", type: "error" });
       return;
     }
@@ -31,15 +32,22 @@ const AddTimer = () => {
       JSON.parse(
         JSON.stringify({
           name,
-          timerType,
-          targetTime: targetTime.slice(0, numTarget),
-          countDown: timerType !== "stopwatch",
+          type: timerType,
+          targets: targetTime.slice(0, numTarget),
+          offset: timerType === "stopwatch" ? 10 : -10,
+          rounds: parseInt(rounds) || 1,
         })
       )
     );
 
     setMessage({ message: "Timer added!", type: "confirm" });
   };
+
+  useEffect(() => {
+    if (timerType !== "tabata") {
+      setNumTarget(1);
+    }
+  }, [timerType]);
 
   const handleChangeType = (e) => {
     setTimerType(e.target.value);
@@ -60,9 +68,13 @@ const AddTimer = () => {
     setName(e.target.value);
   };
 
+  const handleRoundChange = (e) => {
+    setRounds(e.target.value);
+  };
+
   return (
-    <div>
-      <div>
+    <div className={styles.wrapper}>
+      <div className={styles.inputWrapper}>
         <div>{message.message}</div>
         <select id="timerType" onChange={handleChangeType}>
           <option value="stopwatch">Stop Watch</option>
@@ -72,13 +84,16 @@ const AddTimer = () => {
         </select>
 
         {timerType === "tabata" && (
-          <select id="numTarget" onChange={handleChangeNumTarget}>
-            {[...Array(5).keys()].map((num) => (
-              <option value={num + 1} key={num + 1}>
-                {num + 1}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label for="numTarget">Numer of target</label>
+            <select id="numTarget" onChange={handleChangeNumTarget}>
+              {[...Array(5).keys()].map((num) => (
+                <option value={num + 1} key={num + 1}>
+                  {num + 1}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
 
         <input
@@ -86,11 +101,18 @@ const AddTimer = () => {
           value={name}
           onChange={handleChangeName}
         />
+        {["xy", "tabata"].includes(timerType) && (
+          <input
+            placeholder="Number of rounds"
+            value={rounds}
+            onChange={handleRoundChange}
+          />
+        )}
 
         <button onClick={handleAdd}>Add Timer</button>
       </div>
 
-      <div>
+      <div className={styles.timeWrapper}>
         {[...Array(numTarget).keys()].map((index) => (
           <TimeSelector
             setTime={(time) => handleSetTarget(index, time)}

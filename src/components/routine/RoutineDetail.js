@@ -1,12 +1,34 @@
-const RoutineDetail = ({ name, timerType, targetTime }) => {
+import { useEffect, useRef } from "react";
+import { useWorkoutContext } from "../../context/WorkoutProvider";
+import styles from "./RoutineDetail.module.css";
+
+const RoutineDetail = ({ name, type, targets, index }) => {
+  const { currentIndex, removeTimer } = useWorkoutContext();
+  const detailRef = useRef();
+
+  useEffect(() => {
+    if (currentIndex && currentIndex === index) {
+      detailRef.current.scrollIntoView();
+    }
+  }, [currentIndex]);
+
   return (
-    <div>
-      <div>{name}</div>
-      <div>{timerType}</div>
+    <div
+      className={styles.wrapper}
+      style={{ borderColor: index === currentIndex ? "red" : "white" }}
+      ref={detailRef}
+    >
+      <div className={styles.title}>
+        <div>{name.toUpperCase()}</div>
+        <div>{type.toUpperCase()}</div>
+      </div>
       <div>
-        {targetTime.map((target, index) => (
-          <div key={index}>{target}</div>
+        {targets.map((target, index) => (
+          <div key={index}>{`${target / 1000}s`}</div>
         ))}
+      </div>
+      <div className={styles.closeBtn} onClick={() => removeTimer(index)}>
+        X
       </div>
     </div>
   );
