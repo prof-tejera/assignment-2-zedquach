@@ -36,6 +36,7 @@ const useTimer = () => {
     pauseTimer();
     root.style.setProperty("--round-progress", "");
     if (isRunning) {
+      setCurrentTime(currentTimer.offset < 0 ? currentTimer.targets[0] : 0);
       runTimer();
     }
     setCurrentRound(1);
