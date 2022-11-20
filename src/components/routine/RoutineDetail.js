@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useWorkoutContext } from "../../context/WorkoutProvider";
 import styles from "./RoutineDetail.module.css";
 
-const RoutineDetail = ({ name, type, targets, index }) => {
+const RoutineDetail = ({ name, type, targets, index, rounds }) => {
   const { currentIndex, removeTimer } = useWorkoutContext();
   const detailRef = useRef();
 
@@ -21,6 +21,7 @@ const RoutineDetail = ({ name, type, targets, index }) => {
       <div className={styles.title}>
         <div>{name.toUpperCase()}</div>
         <div>{type.toUpperCase()}</div>
+        <div>Rounds: {rounds}</div>
       </div>
       <div>
         {targets.map((target, index) => (

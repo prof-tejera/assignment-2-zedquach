@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useWorkoutContext } from "../context/WorkoutProvider";
 
 const useTimer = () => {
-  const { currentTimer, nextTimer, isRunning, setIsRunning, reset } =
-    useWorkoutContext();
+  const { currentTimer, nextTimer, isRunning, reset } = useWorkoutContext();
   const [currentTime, setCurrentTime] = useState(0);
   const [currentRound, setCurrentRound] = useState(1);
   const [currentTarget, setCurentTarget] = useState(0);

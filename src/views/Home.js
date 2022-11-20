@@ -4,7 +4,6 @@ import useTimer from "../hooks/useTimer";
 import styles from "./Home.module.css";
 
 import { useWorkoutContext } from "../context/WorkoutProvider";
-import { useEffect } from "react";
 
 const Home = () => {
   let [timer, setter] = useTimer();
