@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useWorkoutContext } from "../context/WorkoutProvider";
 
 const useTimer = () => {
-  const { currentTimer, nextTimer, isRunning, reset } = useWorkoutContext();
+  const { currentTimer, nextTimer, isRunning, setIsRunning, reset } =
+    useWorkoutContext();
   const [currentTime, setCurrentTime] = useState(0);
   const [currentRound, setCurrentRound] = useState(1);
   const [currentTarget, setCurentTarget] = useState(0);
@@ -12,18 +13,20 @@ const useTimer = () => {
   const root = document.querySelector(":root");
 
   const runTimer = () => {
-    timer.currentTimer = setInterval(() => {
+    timer.current = setInterval(() => {
       setCurrentTime((currentTime) => currentTime + currentTimer.offset);
     }, 10);
   };
 
   const pauseTimer = () => {
-    clearInterval(timer.currentTimer);
+    clearInterval(timer.current);
+    timer.current = null;
   };
 
   const resetTimer = () => {
     pauseTimer();
     reset();
+    root.style.setProperty("--round-progress", "");
     setCurrentRound(1);
     setCurentTarget(0);
     setCurrentTime(currentTimer.offset < 0 ? currentTimer.targets[0] : 0);
@@ -31,12 +34,12 @@ const useTimer = () => {
 
   // Start from beginning of timer
   useEffect(() => {
-    setCurrentRound(1);
+    pauseTimer();
+    root.style.setProperty("--round-progress", "");
     if (isRunning) {
-      // Update interval to use new timer's offset
-      pauseTimer();
       runTimer();
     }
+    setCurrentRound(1);
   }, [currentTimer]);
 
   useEffect(() => {
@@ -49,14 +52,15 @@ const useTimer = () => {
 
   // Move to next target when time reach the end
   useEffect(() => {
-    if (
-      currentTimer &&
-      currentTime ===
+    if (currentTimer) {
+      if (
+        currentTime ===
         (currentTimer.offset < 0 ? 0 : currentTimer.targets[currentTarget])
-    ) {
-      setCurentTarget((prev) => prev + 1);
+      ) {
+        setCurentTarget((prev) => prev + 1);
+      }
     }
-  }, [currentTime, currentTimer]);
+  }, [currentTime]);
 
   // Start a round from beginning
   useEffect(() => {
@@ -65,18 +69,25 @@ const useTimer = () => {
         setCurentTarget(0);
         let width = (360 - currentTimer.rounds * 5) / currentTimer.rounds;
         let roundProgress = "";
-        for (let i = 1; i <= currentRound; i++) {
-          let start = (360 / currentTimer.rounds) * (i - 1);
-          roundProgress += `white ${start}deg, white ${
-            start + width
-          }deg, #0a0240 ${start + width}deg, #0a0240 ${start + width + 5}deg,`;
+        if (currentTimer.rounds > 1) {
+          for (let i = 1; i <= currentRound; i++) {
+            let start = (360 / currentTimer.rounds) * (i - 1);
+            roundProgress += `white ${start}deg, white ${
+              start + width
+            }deg, #0a0240 ${start + width}deg, #0a0240 ${
+              start + width + 5
+            }deg,`;
+          }
+          root.style.setProperty(
+            "--round-progress",
+            roundProgress.slice(0, -1)
+          );
         }
-        root.style.setProperty("--round-progress", roundProgress.slice(0, -1));
       } else {
         nextTimer();
       }
     }
-  }, [currentRound, currentTimer]);
+  }, [currentRound]);
 
   // Start a target from beginning
   useEffect(() => {
@@ -89,10 +100,10 @@ const useTimer = () => {
         setCurrentRound((prev) => prev + 1);
       }
     }
-  }, [currentTarget, currentTimer]);
+  }, [currentTarget]);
 
   useEffect(() => {
-    return () => clearInterval(timer.currentTimer);
+    return () => clearInterval(timer.current);
   }, []);
 
   useEffect(() => {

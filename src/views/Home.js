@@ -15,10 +15,6 @@ const Home = () => {
     setIsRunning((prev) => !prev);
   };
 
-  useEffect(() => {
-    console.log(timers);
-  }, [timers]);
-
   return (
     <div className={styles.wrapper}>
       <RoutineList />
