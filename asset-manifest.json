@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/assignment-2-zedquach/static/css/main.4d0d525f.css",
+    "main.js": "/assignment-2-zedquach/static/js/main.7f008ca3.js",
+    "index.html": "/assignment-2-zedquach/index.html",
+    "main.4d0d525f.css.map": "/assignment-2-zedquach/static/css/main.4d0d525f.css.map",
+    "main.7f008ca3.js.map": "/assignment-2-zedquach/static/js/main.7f008ca3.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4d0d525f.css",
+    "static/js/main.7f008ca3.js"
+  ]
+}
